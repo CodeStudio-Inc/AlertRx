@@ -22,7 +22,7 @@ export default async function PatientProfilePage() {
   if (!session?.user || session.user.role !== "patient") redirect("/login");
 
   const result = await getPatientProfile(session.user.id);
-  const profile = result.data;
+  const profile = result.profile;
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -77,7 +77,7 @@ export default async function PatientProfilePage() {
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm">
               <Phone className="h-4 w-4 text-muted-foreground" />
-              <span>{session.user.phone ?? "No phone on file"}</span>
+              <span>{(result.user as any)?.phone ?? "No phone on file"}</span>
             </div>
             {session.user.email && (
               <div className="flex items-center gap-2 text-sm">

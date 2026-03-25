@@ -50,7 +50,6 @@ export default async function UploadsPage() {
         </CardHeader>
         <CardContent>
           <FileUpload
-            ownerUserId={session.user.id}
             resourceType="prescription"
             onUploadComplete={() => {}}
           />

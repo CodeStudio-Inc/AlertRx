@@ -52,10 +52,7 @@ function UserActions({ user }: { user: UserRow }) {
 
   function updateStatus(status: "active" | "suspended" | "inactive") {
     startTransition(async () => {
-      const formData = new FormData();
-      formData.append("userId", user._id);
-      formData.append("status", status);
-      const result = await updateUserStatusAction(formData);
+      const result = await updateUserStatusAction({ userId: user._id, status });
       if (!result.success) {
         toast.error(result.error ?? "Failed to update user");
       } else {

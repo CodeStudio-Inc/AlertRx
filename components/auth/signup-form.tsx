@@ -46,11 +46,7 @@ export function SignupForm() {
   function onSubmit(data: SignupInput) {
     setError(null);
     startTransition(async () => {
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        formData.append(key, value as string);
-      });
-      const result = await signupAction(formData);
+      const result = await signupAction(data);
       if (result?.error) {
         setError(result.error);
       } else {

@@ -25,7 +25,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <SessionProvider>
           {children}
-          <Toaster richColors closeButton position="top-right" />
+          <Toaster />
         </SessionProvider>
       </body>
     </html>

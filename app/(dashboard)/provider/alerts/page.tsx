@@ -27,8 +27,8 @@ export default async function AlertsPage() {
     redirect("/login");
   }
 
-  const result = await getAllAlertsAdmin({ resolved: false, page: 1, limit: 50 });
-  const alerts = result.data?.alerts ?? [];
+  const allAlerts = await getAllAlertsAdmin(50);
+  const alerts = (allAlerts as any[]).filter((a: any) => !a.resolved);
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -74,9 +74,7 @@ export default async function AlertsPage() {
                 <form
                   action={async () => {
                     "use server";
-                    const formData = new FormData();
-                    formData.append("alertId", alert._id);
-                    await resolveAlertAction(formData);
+                    await resolveAlertAction(alert._id.toString());
                   }}
                 >
                   <Button

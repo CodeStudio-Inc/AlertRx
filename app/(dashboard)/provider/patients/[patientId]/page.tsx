@@ -43,9 +43,9 @@ export default async function PatientDetailPage({ params }: PageProps) {
     getMedicationsForPatient(patientId),
   ]);
 
-  if (!summaryResult.data) notFound();
+  if (!summaryResult) notFound();
 
-  const patient = summaryResult.data;
+  const patient = summaryResult;
   const medications = medsResult.data ?? [];
   const active = medications.filter((m) => m.status === "active");
 
@@ -74,14 +74,14 @@ export default async function PatientDetailPage({ params }: PageProps) {
               <Progress value={patient.adherenceScore} className="flex-1" />
               <span
                 className={`text-sm font-bold ${
-                  patient.adherenceScore >= 80
+                  (patient.adherenceScore ?? 0) >= 80
                     ? "text-green-600"
-                    : patient.adherenceScore >= 50
+                    : (patient.adherenceScore ?? 0) >= 50
                     ? "text-yellow-600"
                     : "text-destructive"
                 }`}
               >
-                {patient.adherenceScore}%
+                {patient.adherenceScore ?? 0}%
               </span>
             </div>
           </CardContent>
@@ -99,7 +99,7 @@ export default async function PatientDetailPage({ params }: PageProps) {
             <p className="text-xs text-muted-foreground">Unresolved Alerts</p>
             <p
               className={`text-3xl font-bold mt-1 ${
-                patient.unresolvedAlerts > 0 ? "text-destructive" : "text-primary"
+                (patient.unresolvedAlerts ?? 0) > 0 ? "text-destructive" : "text-primary"
               }`}
             >
               {patient.unresolvedAlerts}
@@ -156,9 +156,9 @@ export default async function PatientDetailPage({ params }: PageProps) {
         </TabsContent>
 
         <TabsContent value="alerts" className="mt-4">
-          {patient.recentAlerts && patient.recentAlerts.length > 0 ? (
+          {(patient as any).recentAlerts && (patient as any).recentAlerts.length > 0 ? (
             <div className="space-y-3">
-              {patient.recentAlerts.map((alert: any) => (
+              {(patient as any).recentAlerts.map((alert: any) => (
                 <div
                   key={alert._id.toString()}
                   className="flex items-start gap-3 rounded-lg border p-3"
@@ -197,10 +197,10 @@ export default async function PatientDetailPage({ params }: PageProps) {
                     <p>{patient.email}</p>
                   </div>
                 )}
-                {patient.dateOfBirth && (
+                {(patient as any).dateOfBirth && (
                   <div>
                     <p className="text-xs text-muted-foreground">Date of Birth</p>
-                    <p>{format(new Date(patient.dateOfBirth), "MMM d, yyyy")}</p>
+                    <p>{format(new Date((patient as any).dateOfBirth), "MMM d, yyyy")}</p>
                   </div>
                 )}
                 {patient.gender && (
@@ -210,11 +210,11 @@ export default async function PatientDetailPage({ params }: PageProps) {
                   </div>
                 )}
               </div>
-              {patient.allergies && patient.allergies.length > 0 && (
+              {(patient as any).allergies && (patient as any).allergies.length > 0 && (
                 <div>
                   <p className="text-xs text-muted-foreground mb-2">Allergies</p>
                   <div className="flex flex-wrap gap-2">
-                    {patient.allergies.map((a: string) => (
+                    {(patient as any).allergies.map((a: string) => (
                       <Badge key={a} variant="destructive" className="text-xs">
                         {a}
                       </Badge>
@@ -222,13 +222,13 @@ export default async function PatientDetailPage({ params }: PageProps) {
                   </div>
                 </div>
               )}
-              {patient.chronicConditions && patient.chronicConditions.length > 0 && (
+              {(patient as any).chronicConditions && (patient as any).chronicConditions.length > 0 && (
                 <div>
                   <p className="text-xs text-muted-foreground mb-2">
                     Chronic Conditions
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {patient.chronicConditions.map((c: string) => (
+                    {(patient as any).chronicConditions.map((c: string) => (
                       <Badge key={c} variant="secondary" className="text-xs">
                         {c}
                       </Badge>

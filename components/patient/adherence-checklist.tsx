@@ -38,13 +38,9 @@ function DoseItem({ dose }: { dose: Dose }) {
 
   function mark(status: "taken" | "skipped") {
     startTransition(async () => {
-      const formData = new FormData();
-      formData.append("adherenceLogId", dose.adherenceLogId);
-      formData.append("status", status);
-      if (status === "taken") formData.append("takenAt", new Date().toISOString());
-      const result = await markDoseAction(formData);
-      if (!result.success) {
-        toast.error(result.error ?? "Failed to update dose");
+      const result = await markDoseAction({ adherenceLogId: dose.adherenceLogId, status });
+      if ((result as any).error || !(result as any).success) {
+        toast.error((result as any).error ?? "Failed to update dose");
       } else {
         setCurrentStatus(status);
         toast.success(status === "taken" ? "Dose marked as taken" : "Dose skipped");

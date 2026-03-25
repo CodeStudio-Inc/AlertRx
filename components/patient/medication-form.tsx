@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useTransition, useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusCircle, Trash2, Loader2, Pill } from "lucide-react";
@@ -67,34 +67,27 @@ export function MedicationForm({ patientId, onSuccess }: MedicationFormProps) {
   } = useForm<MedicationLogInput>({
     resolver: zodResolver(medicationLogSchema),
     defaultValues: {
-      patientId,
       frequency: "once_daily",
-      routeOfAdministration: "oral",
-    },
+      route: "oral",
+    } as any,
   });
 
   function onSubmit(data: MedicationLogInput) {
     startTransition(async () => {
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          formData.append(key, String(value));
-        }
-      });
-      const result = await createMedicationAction(formData);
+      const result = await createMedicationAction({ ...data, patientId } as any);
       if (!result.success) {
         toast.error(result.error ?? "Failed to save medication");
         return;
       }
-      if (result.data?.alerts && result.data.alerts.length > 0) {
-        setAlerts(result.data.alerts);
+      if (result.alerts && result.alerts.length > 0) {
+        setAlerts(result.alerts);
         toast.warning(
-          `Medication saved with ${result.data.alerts.length} alert(s). Review below.`
+          `Medication saved with ${result.alerts.length} alert(s). Review below.`
         );
       } else {
         toast.success("Medication logged successfully");
       }
-      reset({ patientId, frequency: "once_daily", routeOfAdministration: "oral" });
+      reset({ frequency: "once_daily", route: "oral" } as any);
       onSuccess?.();
     });
   }
@@ -109,7 +102,7 @@ export function MedicationForm({ patientId, onSuccess }: MedicationFormProps) {
           {alerts.map((alert, i) => (
             <div key={i} className="flex items-start gap-2">
               <AlertBadge severity={alert.severity} />
-              <p className="text-xs text-yellow-700">{alert.message}</p>
+              <p className="text-xs text-yellow-700">{alert.description}</p>
             </div>
           ))}
         </div>
