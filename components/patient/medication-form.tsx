@@ -109,7 +109,6 @@ export function MedicationForm({ patientId, onSuccess }: MedicationFormProps) {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        <input type="hidden" {...register("patientId")} value={patientId} />
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
