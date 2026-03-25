@@ -30,23 +30,23 @@ const FREQUENCY_OPTIONS = [
   { value: "twice_daily", label: "Twice daily" },
   { value: "three_times_daily", label: "Three times daily" },
   { value: "four_times_daily", label: "Four times daily" },
-  { value: "every_6_hours", label: "Every 6 hours" },
   { value: "every_8_hours", label: "Every 8 hours" },
+  { value: "every_12_hours", label: "Every 12 hours" },
   { value: "weekly", label: "Weekly" },
   { value: "as_needed", label: "As needed (PRN)" },
 ];
 
 const ROUTE_OPTIONS = [
   { value: "oral", label: "Oral" },
-  { value: "intravenous", label: "Intravenous (IV)" },
-  { value: "intramuscular", label: "Intramuscular (IM)" },
-  { value: "subcutaneous", label: "Subcutaneous" },
   { value: "topical", label: "Topical" },
-  { value: "inhalation", label: "Inhalation" },
+  { value: "injection", label: "Injection" },
+  { value: "inhaled", label: "Inhaled" },
   { value: "sublingual", label: "Sublingual" },
   { value: "rectal", label: "Rectal" },
   { value: "ophthalmic", label: "Ophthalmic (Eye)" },
   { value: "otic", label: "Otic (Ear)" },
+  { value: "nasal", label: "Nasal" },
+  { value: "other", label: "Other" },
 ];
 
 interface MedicationFormProps {
@@ -112,15 +112,15 @@ export function MedicationForm({ patientId, onSuccess }: MedicationFormProps) {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="drugName">Drug Name</Label>
+            <Label htmlFor="medicationName">Drug Name</Label>
             <Input
-              id="drugName"
+              id="medicationName"
               type="text"
               placeholder="e.g. Amoxicillin"
-              {...register("drugName")}
+              {...register("medicationName")}
             />
-            {errors.drugName && (
-              <p className="text-xs text-destructive">{errors.drugName.message}</p>
+            {errors.medicationName && (
+              <p className="text-xs text-destructive">{errors.medicationName.message}</p>
             )}
           </div>
 
@@ -168,18 +168,18 @@ export function MedicationForm({ patientId, onSuccess }: MedicationFormProps) {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="routeOfAdministration">Route</Label>
+            <Label htmlFor="route">Route</Label>
             <Select
               defaultValue="oral"
               onValueChange={(v) =>
                 setValue(
-                  "routeOfAdministration",
-                  v as MedicationLogInput["routeOfAdministration"],
+                  "route",
+                  v as MedicationLogInput["route"],
                   { shouldValidate: true }
                 )
               }
             >
-              <SelectTrigger id="routeOfAdministration">
+              <SelectTrigger id="route">
                 <SelectValue placeholder="Select route" />
               </SelectTrigger>
               <SelectContent>
@@ -215,12 +215,12 @@ export function MedicationForm({ patientId, onSuccess }: MedicationFormProps) {
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="indication">Indication (optional)</Label>
+          <Label htmlFor="reason">Indication (optional)</Label>
           <Input
-            id="indication"
+            id="reason"
             type="text"
             placeholder="Reason for this medication"
-            {...register("indication")}
+            {...register("reason")}
           />
         </div>
 
