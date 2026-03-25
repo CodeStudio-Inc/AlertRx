@@ -196,7 +196,7 @@ export async function getPharmacistDashboardData(pharmacistUserId: string) {
     patientsServed: uniquePatientIds.size,
     flaggedForReview,
     recentDispenses,
-    flaggedPatients: [],
+    flaggedPatients: [] as any[],
   };
 }
 

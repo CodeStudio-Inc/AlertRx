@@ -30,12 +30,8 @@ export default async function AdminAlertsPage({ searchParams }: PageProps) {
   const { resolved } = await searchParams;
   const showResolved = resolved === "true";
 
-  const result = await getAllAlertsAdmin({
-    resolved: showResolved,
-    page: 1,
-    limit: 100,
-  });
-  const alerts = result.data?.alerts ?? [];
+  const allAlerts = await getAllAlertsAdmin(100);
+  const alerts = allAlerts.filter((a: any) => a.resolved === showResolved);
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -68,11 +64,13 @@ export default async function AdminAlertsPage({ searchParams }: PageProps) {
       {alerts.length > 0 ? (
         <div className="space-y-3">
           {alerts.map((alert: any) => (
-            <Card key={alert._id}>
+            <Card key={alert._id.toString()}>
               <CardContent className="pt-4 flex items-start gap-3">
                 <AlertBadge severity={alert.severity} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">{alert.message}</p>
+                    <p className="text-sm font-medium">
+                      {alert.description ?? alert.message}
+                    </p>
                   <div className="flex flex-wrap items-center gap-2 mt-1">
                     <Badge
                       variant="outline"
@@ -91,7 +89,7 @@ export default async function AdminAlertsPage({ searchParams }: PageProps) {
                       className="p-0 h-auto text-xs mt-1"
                       asChild
                     >
-                      <Link href={`/provider/patients/${alert.patientId}`}>
+                      <Link href={`/provider/patients/${alert.patientId?._id ?? alert.patientId}`}>
                         View patient
                       </Link>
                     </Button>
@@ -106,9 +104,7 @@ export default async function AdminAlertsPage({ searchParams }: PageProps) {
                   <form
                     action={async () => {
                       "use server";
-                      const formData = new FormData();
-                      formData.append("alertId", alert._id);
-                      await resolveAlertAction(formData);
+                      await resolveAlertAction(alert._id.toString());
                     }}
                   >
                     <Button

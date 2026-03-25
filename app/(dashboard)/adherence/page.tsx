@@ -25,8 +25,8 @@ export default async function AdherencePage() {
     getAdherenceScore(session.user.id, 30),
   ]);
 
-  const doses = dosesResult.data ?? [];
-  const score = scoreResult.data ?? 0;
+  const doses = dosesResult ?? [];
+  const score = scoreResult ?? 0;
 
   return (
     <div className="max-w-2xl space-y-6">

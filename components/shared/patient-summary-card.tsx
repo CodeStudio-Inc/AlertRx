@@ -7,30 +7,68 @@ import { getAdherenceLabel, getAdherenceColor } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 interface PatientSummaryCardProps {
-  patient: PatientSummary;
+  patient?: PatientSummary;
   href?: string;
+  id?: string;
+  name?: string;
+  patientId?: string;
+  phone?: string;
+  email?: string;
+  age?: number;
+  gender?: string;
+  activeMedications?: number;
+  adherenceScore?: number;
+  unresolvedAlerts?: number;
+  lastActivity?: string | Date;
+  compact?: boolean;
 }
 
-export function PatientSummaryCard({ patient, href }: PatientSummaryCardProps) {
+export function PatientSummaryCard({
+  patient,
+  href,
+  name,
+  patientId,
+  phone,
+  age,
+  gender,
+  activeMedications,
+  adherenceScore,
+  unresolvedAlerts,
+}: PatientSummaryCardProps) {
+  const resolvedPatient: PatientSummary =
+    patient ??
+    ({
+      id: "",
+      patientId: patientId ?? "",
+      name: name ?? "Unknown Patient",
+      phone: phone ?? "",
+      age,
+      gender: gender as PatientSummary["gender"],
+      activeMedications: activeMedications ?? 0,
+      unresolvedAlerts: unresolvedAlerts ?? 0,
+      adherenceScore,
+      recentPrescriptions: 0,
+    } as PatientSummary);
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
-              {patient.name.charAt(0).toUpperCase()}
+              {resolvedPatient.name.charAt(0).toUpperCase()}
             </div>
             <div>
-              <p className="font-semibold text-foreground">{patient.name}</p>
+              <p className="font-semibold text-foreground">{resolvedPatient.name}</p>
               <p className="text-xs text-muted-foreground font-mono">
-                {patient.patientId}
+                {resolvedPatient.patientId}
               </p>
             </div>
           </div>
-          {patient.unresolvedAlerts > 0 && (
+          {resolvedPatient.unresolvedAlerts > 0 && (
             <Badge variant="destructive" className="text-xs gap-1">
               <AlertCircle className="h-3 w-3" />
-              {patient.unresolvedAlerts} alert{patient.unresolvedAlerts > 1 ? "s" : ""}
+              {resolvedPatient.unresolvedAlerts} alert{resolvedPatient.unresolvedAlerts > 1 ? "s" : ""}
             </Badge>
           )}
         </div>
@@ -38,13 +76,13 @@ export function PatientSummaryCard({ patient, href }: PatientSummaryCardProps) {
       <CardContent className="space-y-3">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Phone className="h-3.5 w-3.5" />
-          <span>{patient.phone}</span>
-          {patient.age && (
+          <span>{resolvedPatient.phone}</span>
+          {resolvedPatient.age && (
             <>
               <span className="text-border">•</span>
               <span>
-                {patient.age} yrs
-                {patient.gender ? `, ${patient.gender}` : ""}
+                {resolvedPatient.age} yrs
+                {resolvedPatient.gender ? `, ${resolvedPatient.gender}` : ""}
               </span>
             </>
           )}
@@ -55,22 +93,22 @@ export function PatientSummaryCard({ patient, href }: PatientSummaryCardProps) {
             <Pill className="h-3.5 w-3.5 text-blue-500" />
             <span>
               <span className="font-medium text-foreground">
-                {patient.activeMedications}
+                {resolvedPatient.activeMedications}
               </span>{" "}
               active meds
             </span>
           </div>
-          {patient.adherenceScore !== undefined && (
+          {resolvedPatient.adherenceScore !== undefined && (
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <Activity className="h-3.5 w-3.5 text-green-500" />
               <span>
                 <span
                   className={cn(
                     "font-medium",
-                    getAdherenceColor(patient.adherenceScore)
+                    getAdherenceColor(resolvedPatient.adherenceScore)
                   )}
                 >
-                  {patient.adherenceScore}%
+                  {resolvedPatient.adherenceScore}%
                 </span>{" "}
                 adherence
               </span>

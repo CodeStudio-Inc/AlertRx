@@ -160,12 +160,12 @@ export default async function PatientDetailPage({ params }: PageProps) {
             <div className="space-y-3">
               {patient.recentAlerts.map((alert: any) => (
                 <div
-                  key={alert._id}
+                  key={alert._id.toString()}
                   className="flex items-start gap-3 rounded-lg border p-3"
                 >
                   <AlertBadge severity={alert.severity} />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm">{alert.message}</p>
+                    <p className="text-sm">{alert.description}</p>
                     <p className="text-xs text-muted-foreground capitalize">
                       {alert.type.replace(/_/g, " ")} &bull;{" "}
                       {format(new Date(alert.createdAt), "MMM d, yyyy")}

@@ -54,7 +54,7 @@ export default async function DispenseRecordsPage() {
               </TableHeader>
               <TableBody>
                 {records.map((record: any) => (
-                  <TableRow key={record._id}>
+                  <TableRow key={record._id.toString()}>
                     <TableCell className="font-medium">
                       {record.patientName ?? "—"}
                     </TableCell>

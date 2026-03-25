@@ -106,7 +106,7 @@ export default async function PharmacistDashboardPage() {
               <div className="divide-y">
                 {data.recentDispenses.slice(0, 5).map((record) => (
                   <div
-                    key={record._id}
+                    key={record._id.toString()}
                     className="flex items-center justify-between py-3 gap-3"
                   >
                     <div className="min-w-0">

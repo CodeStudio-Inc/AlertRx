@@ -42,6 +42,11 @@ export default async function AdminFacilitiesPage() {
   const result = await getAllFacilities();
   const facilities = result.data ?? [];
 
+  const createFacilityFormAction = async (formData: FormData) => {
+    "use server";
+    await createFacilityAction(Object.fromEntries(formData.entries()));
+  };
+
   return (
     <div className="max-w-4xl space-y-6">
       <div>
@@ -63,7 +68,7 @@ export default async function AdminFacilitiesPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={createFacilityAction} className="grid gap-4 sm:grid-cols-2">
+          <form action={createFacilityFormAction} className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="name">Facility Name</Label>
               <Input
@@ -120,7 +125,7 @@ export default async function AdminFacilitiesPage() {
       {facilities.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2">
           {facilities.map((fac: any) => (
-            <Card key={fac._id}>
+            <Card key={fac._id.toString()}>
               <CardContent className="pt-5 space-y-2">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2">

@@ -136,7 +136,7 @@ export default async function AdminDashboardPage() {
             {data.criticalAlerts && data.criticalAlerts.length > 0 ? (
               data.criticalAlerts.slice(0, 5).map((alert) => (
                 <div
-                  key={alert._id}
+                  key={alert._id.toString()}
                   className="flex items-start gap-3 rounded-lg border p-3"
                 >
                   <AlertBadge severity={alert.severity} />

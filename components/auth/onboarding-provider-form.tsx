@@ -19,7 +19,7 @@ import {
   providerOnboardingSchema,
   type ProviderOnboardingInput,
 } from "@/lib/validators/provider.schema";
-import { completeProviderOnboardingAction } from "@/actions/patient.actions";
+import { completeOnboardingAction } from "@/actions/patient.actions";
 
 const PROFESSION_OPTIONS = [
   { value: "doctor", label: "Doctor (MD / MBBS)" },
@@ -52,13 +52,7 @@ export function OnboardingProviderForm() {
 
   function onSubmit(data: ProviderOnboardingInput) {
     startTransition(async () => {
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          formData.append(key, String(value));
-        }
-      });
-      const result = await completeProviderOnboardingAction(formData);
+      const result = await completeOnboardingAction(data as Record<string, any>);
       if (result?.error) {
         toast.error(result.error);
       }

@@ -42,11 +42,11 @@ export default async function AlertsPage() {
       {alerts.length > 0 ? (
         <div className="space-y-3">
           {alerts.map((alert: any) => (
-            <Card key={alert._id}>
+            <Card key={alert._id.toString()}>
               <CardContent className="pt-4 flex items-start gap-3">
                 <AlertBadge severity={alert.severity} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">{alert.message}</p>
+                  <p className="text-sm font-medium">{alert.description}</p>
                   <div className="flex items-center gap-3 mt-1">
                     <p className="text-xs text-muted-foreground capitalize">
                       {alert.type.replace(/_/g, " ")}

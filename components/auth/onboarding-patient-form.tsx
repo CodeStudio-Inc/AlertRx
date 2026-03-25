@@ -20,7 +20,7 @@ import {
   patientOnboardingSchema,
   type PatientOnboardingInput,
 } from "@/lib/validators/patient.schema";
-import { completePatientOnboardingAction } from "@/actions/patient.actions";
+import { completeOnboardingAction } from "@/actions/patient.actions";
 
 const GENDER_OPTIONS = [
   { value: "male", label: "Male" },
@@ -54,13 +54,7 @@ export function OnboardingPatientForm() {
 
   function onSubmit(data: PatientOnboardingInput) {
     startTransition(async () => {
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          formData.append(key, String(value));
-        }
-      });
-      const result = await completePatientOnboardingAction(formData);
+      const result = await completeOnboardingAction(data as Record<string, any>);
       if (result?.error) {
         toast.error(result.error);
       }
