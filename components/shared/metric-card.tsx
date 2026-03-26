@@ -1,7 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { DashboardMetric } from "@/lib/types";
-import type { LucideIcon } from "lucide-react";
+import type { ComponentType } from "react";
+
+type LucideIcon = ComponentType<{ className?: string }>;
 
 type MetricCardProps = {
   metric?: DashboardMetric;

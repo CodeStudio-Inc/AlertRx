@@ -34,6 +34,8 @@ export function DispenseForm({ patientId, prescriptionId }: DispenseFormProps) {
     defaultValues: {
       patientId,
       prescriptionId,
+      dispensedAt: new Date().toISOString().slice(0, 10),
+      quantity: "",
       flaggedForReview: false,
     },
   });
@@ -42,13 +44,7 @@ export function DispenseForm({ patientId, prescriptionId }: DispenseFormProps) {
 
   function onSubmit(data: DispenseRecordInput) {
     startTransition(async () => {
-      const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          formData.append(key, String(value));
-        }
-      });
-      const result = await createDispenseRecordAction(formData);
+      const result = await createDispenseRecordAction(data);
       if (!result.success) {
         toast.error(result.error ?? "Failed to create record");
       } else {
@@ -80,29 +76,23 @@ export function DispenseForm({ patientId, prescriptionId }: DispenseFormProps) {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="quantityDispensed">Quantity</Label>
+          <Label htmlFor="quantity">Quantity</Label>
           <Input
-            id="quantityDispensed"
-            type="number"
-            min={1}
+            id="quantity"
+            type="text"
             placeholder="30"
-            {...register("quantityDispensed", { valueAsNumber: true })}
+            {...register("quantity")}
           />
-          {errors.quantityDispensed && (
+          {errors.quantity && (
             <p className="text-xs text-destructive">
-              {errors.quantityDispensed.message}
+              {errors.quantity.message}
             </p>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="batchNumber">Batch / Lot Number (optional)</Label>
-          <Input
-            id="batchNumber"
-            type="text"
-            placeholder="LOT-2024-XXXXX"
-            {...register("batchNumber")}
-          />
+          <Label htmlFor="dispensedAt">Dispensed On</Label>
+          <Input id="dispensedAt" type="date" {...register("dispensedAt")} />
         </div>
       </div>
 

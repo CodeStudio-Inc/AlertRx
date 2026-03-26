@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusCircle, Trash2, Loader2, FileText, AlertTriangle } from "lucide-react";
@@ -34,23 +34,23 @@ const FREQUENCY_OPTIONS = [
   { value: "twice_daily", label: "Twice daily" },
   { value: "three_times_daily", label: "3× daily" },
   { value: "four_times_daily", label: "4× daily" },
-  { value: "every_6_hours", label: "Every 6 h" },
   { value: "every_8_hours", label: "Every 8 h" },
+  { value: "every_12_hours", label: "Every 12 h" },
   { value: "weekly", label: "Weekly" },
   { value: "as_needed", label: "As needed (PRN)" },
 ];
 
 const ROUTE_OPTIONS = [
   { value: "oral", label: "Oral" },
-  { value: "intravenous", label: "IV" },
-  { value: "intramuscular", label: "IM" },
-  { value: "subcutaneous", label: "Subcutaneous" },
   { value: "topical", label: "Topical" },
-  { value: "inhalation", label: "Inhalation" },
+  { value: "injection", label: "Injection" },
+  { value: "inhaled", label: "Inhaled" },
   { value: "sublingual", label: "Sublingual" },
   { value: "rectal", label: "Rectal" },
   { value: "ophthalmic", label: "Eye drops" },
   { value: "otic", label: "Ear drops" },
+  { value: "nasal", label: "Nasal" },
+  { value: "other", label: "Other" },
 ];
 
 interface PrescriptionFormProps {
@@ -77,12 +77,13 @@ export function PrescriptionForm({ patientId, onSuccess }: PrescriptionFormProps
       patientId,
       medications: [
         {
-          drugName: "",
+          medicationName: "",
           dosage: "",
           frequency: "once_daily",
-          routeOfAdministration: "oral",
+          route: "oral",
         },
       ],
+      issueDate: new Date().toISOString().slice(0, 10),
       acknowledgedAlerts: false,
     },
   });
@@ -95,21 +96,23 @@ export function PrescriptionForm({ patientId, onSuccess }: PrescriptionFormProps
   const medications = watch("medications");
 
   function handlePreview() {
-    const meds = medications.filter((m) => m.drugName.trim());
+    const meds = medications.filter((m) => m.medicationName.trim());
     if (meds.length === 0) {
       toast.info("Add at least one medication before previewing alerts.");
       return;
     }
     startPreview(async () => {
-      const formData = new FormData();
-      formData.append("patientId", patientId);
-      formData.append("medications", JSON.stringify(meds));
-      const result = await previewPrescriptionAlertsAction(formData);
+      const result = await previewPrescriptionAlertsAction({
+        patientId,
+        medications: meds,
+        issueDate: new Date().toISOString().slice(0, 10),
+        acknowledgedAlerts: false,
+      });
       if (!result.success) {
         toast.error(result.error ?? "Preview failed");
         return;
       }
-      const previews = result.data?.alerts ?? [];
+      const previews = result.alerts ?? [];
       setAlertPreviews(previews);
       if (previews.length > 0) {
         setAcknowledgeRequired(true);
@@ -126,16 +129,7 @@ export function PrescriptionForm({ patientId, onSuccess }: PrescriptionFormProps
       return;
     }
     startSubmit(async () => {
-      const formData = new FormData();
-      formData.append("patientId", data.patientId);
-      formData.append("medications", JSON.stringify(data.medications));
-      if (data.notes) formData.append("notes", data.notes);
-      if (data.diagnosisCode) formData.append("diagnosisCode", data.diagnosisCode);
-      formData.append(
-        "acknowledgedAlerts",
-        data.acknowledgedAlerts ? "true" : "false"
-      );
-      const result = await createPrescriptionAction(formData);
+      const result = await createPrescriptionAction(data);
       if (!result.success) {
         toast.error(result.error ?? "Failed to create prescription");
       } else {
@@ -174,11 +168,11 @@ export function PrescriptionForm({ patientId, onSuccess }: PrescriptionFormProps
                 <Input
                   type="text"
                   placeholder="e.g. Amoxicillin"
-                  {...register(`medications.${index}.drugName`)}
+                  {...register(`medications.${index}.medicationName`)}
                 />
-                {errors.medications?.[index]?.drugName && (
+                {errors.medications?.[index]?.medicationName && (
                   <p className="text-xs text-destructive">
-                    {errors.medications[index]?.drugName?.message}
+                    {errors.medications[index]?.medicationName?.message}
                   </p>
                 )}
               </div>
@@ -220,7 +214,7 @@ export function PrescriptionForm({ patientId, onSuccess }: PrescriptionFormProps
                 <Select
                   defaultValue="oral"
                   onValueChange={(v) =>
-                    setValue(`medications.${index}.routeOfAdministration`, v as any, {
+                    setValue(`medications.${index}.route`, v as any, {
                       shouldValidate: true,
                     })
                   }
@@ -239,19 +233,17 @@ export function PrescriptionForm({ patientId, onSuccess }: PrescriptionFormProps
               </div>
 
               <div className="space-y-1.5">
-                <Label>Start Date</Label>
+                <Label>Duration (optional)</Label>
                 <Input
-                  type="date"
-                  {...register(`medications.${index}.startDate`)}
+                  type="text"
+                  placeholder="e.g. 7 days"
+                  {...register(`medications.${index}.duration`)}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label>End Date (optional)</Label>
-                <Input
-                  type="date"
-                  {...register(`medications.${index}.endDate`)}
-                />
+                <Label>Route Notes (optional)</Label>
+                <Input type="text" placeholder="e.g. before meals" disabled />
               </div>
             </div>
 
@@ -272,10 +264,10 @@ export function PrescriptionForm({ patientId, onSuccess }: PrescriptionFormProps
           className="w-full gap-2"
           onClick={() =>
             append({
-              drugName: "",
+              medicationName: "",
               dosage: "",
               frequency: "once_daily",
-              routeOfAdministration: "oral",
+              route: "oral",
             })
           }
         >
@@ -288,15 +280,9 @@ export function PrescriptionForm({ patientId, onSuccess }: PrescriptionFormProps
 
       <div className="space-y-4">
         <div className="space-y-1.5">
-          <Label htmlFor="diagnosisCode">Diagnosis / ICD Code (optional)</Label>
-          <Input
-            id="diagnosisCode"
-            type="text"
-            placeholder="e.g. J06.9 - Acute upper respiratory infection"
-            {...register("diagnosisCode")}
-          />
+          <Label htmlFor="issueDate">Issue Date</Label>
+          <Input id="issueDate" type="date" {...register("issueDate")} />
         </div>
-
         <div className="space-y-1.5">
           <Label htmlFor="notes">Prescription Notes (optional)</Label>
           <Textarea
@@ -320,7 +306,7 @@ export function PrescriptionForm({ patientId, onSuccess }: PrescriptionFormProps
           {alertPreviews.map((alert, i) => (
             <div key={i} className="flex items-start gap-2">
               <AlertBadge severity={alert.severity} />
-              <p className="text-xs text-yellow-700">{alert.message}</p>
+              <p className="text-xs text-yellow-700">{alert.description}</p>
             </div>
           ))}
           <div className="flex items-center gap-2 pt-1">
