@@ -51,9 +51,6 @@ const PatientProfileSchema = new Schema<IPatientProfile>(
   { timestamps: true }
 );
 
-PatientProfileSchema.index({ userId: 1 });
-PatientProfileSchema.index({ patientId: 1 });
-
 export const PatientProfileModel: Model<IPatientProfile> =
   (mongoose.models.PatientProfile as Model<IPatientProfile>) ||
   mongoose.model<IPatientProfile>("PatientProfile", PatientProfileSchema);

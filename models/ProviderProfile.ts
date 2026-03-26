@@ -27,7 +27,6 @@ const ProviderProfileSchema = new Schema<IProviderProfile>(
   { timestamps: true }
 );
 
-ProviderProfileSchema.index({ userId: 1 });
 ProviderProfileSchema.index({ facilityId: 1 });
 
 export const ProviderProfileModel: Model<IProviderProfile> =
