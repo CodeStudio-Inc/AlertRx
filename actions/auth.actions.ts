@@ -6,6 +6,7 @@ import { connectDB } from "@/lib/db/connect";
 import { UserModel } from "@/models/User";
 import bcrypt from "bcryptjs";
 import { signupSchema } from "@/lib/validators/auth.schema";
+import { AuthError } from "next-auth";
 
 export async function loginAction(formData: FormData) {
   const identifier = formData.get("identifier") as string;
@@ -17,11 +18,17 @@ export async function loginAction(formData: FormData) {
       password,
       redirectTo: "/dashboard",
     });
-  } catch (error: any) {
-    if (error?.message?.includes("CredentialsSignin")) {
-      return { error: "Invalid credentials. Please check your details." };
+  } catch (error) {
+    if (error instanceof AuthError) {
+      if (error.type === "CredentialsSignin") {
+        return { error: "Invalid credentials. Please check your details." };
+      }
+      return {
+        error:
+          "Unable to sign in right now. Please try again in a moment.",
+      };
     }
-    throw error; // Re-throw redirect errors
+    throw error; // Keep NEXT_REDIRECT behavior
   }
 }
 
@@ -78,7 +85,16 @@ export async function signupAction(data: {
       redirectTo: "/onboarding",
     });
   } catch (error) {
-    throw error; // Re-throw redirect
+    if (error instanceof AuthError) {
+      if (error.type === "CredentialsSignin") {
+        return { error: "Account created, but automatic sign-in failed." };
+      }
+      return {
+        error:
+          "Account created, but sign-in is temporarily unavailable. Please log in manually.",
+      };
+    }
+    throw error; // Keep NEXT_REDIRECT behavior
   }
 }
 
