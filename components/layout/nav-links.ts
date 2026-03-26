@@ -25,10 +25,10 @@ export interface NavItem {
 export const NAV_LINKS: Record<UserRole, NavItem[]> = {
   patient: [
     { label: "Dashboard", href: "/dashboard/patient", icon: LayoutDashboard },
-    { label: "Medications", href: "/patient/medications", icon: Pill },
-    { label: "Adherence", href: "/patient/adherence", icon: CheckSquare },
-    { label: "Uploads", href: "/patient/uploads", icon: Upload },
-    { label: "My Profile", href: "/patient/profile", icon: User },
+    { label: "Medications", href: "/medications", icon: Pill },
+    { label: "Adherence", href: "/adherence", icon: CheckSquare },
+    { label: "Uploads", href: "/uploads", icon: Upload },
+    { label: "My Profile", href: "/profile", icon: User },
   ],
   provider: [
     { label: "Dashboard", href: "/dashboard/provider", icon: LayoutDashboard },

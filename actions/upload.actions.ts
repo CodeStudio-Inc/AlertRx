@@ -43,6 +43,6 @@ export async function attachUploadToMedication(
     $addToSet: { attachmentIds: uploadId },
   });
 
-  revalidatePath("/patient/medications");
+  revalidatePath("/medications");
   return { success: true };
 }

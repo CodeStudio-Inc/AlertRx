@@ -37,7 +37,7 @@ export async function createMedicationAction(formData: Record<string, any>) {
   const result = await createMedicationLog(parsed.data, patientId, actor);
   if (!result.success) return { error: result.error };
 
-  revalidatePath("/patient/medications");
+  revalidatePath("/medications");
   revalidatePath("/dashboard/patient");
 
   return {
@@ -72,6 +72,6 @@ export async function updateMedicationStatusAction(
   };
 
   const result = await updateMedicationStatus(medicationId, status, actor);
-  revalidatePath("/patient/medications");
+  revalidatePath("/medications");
   return result;
 }
